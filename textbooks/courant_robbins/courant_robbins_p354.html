@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Goetz" />
+    <meta name="description" content="Interactive graphics illustrating the elliptic billiards phenomena discussed in the exercises on page
+        354 of What is Mathematics? (Second Edition) by Courant, Robbins, and Stewart." />
+    <title>Courant, Robbins, Stewart - What is Mathematics? (Second Edition), p354 (Elliptic Billiards Exercises)
+    </title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body onload="renderEx1();renderEx2();">
+    <h1>Overview</h1>
+    <p>This webpage provides interactive graphics illustrating the "elliptic billiards" phenomena discussed in the
+        exercises on page 354 of <i>What is Mathematics?</i> (Second Edition) by Courant, Robbins, and Stewart.</p>
+    <h1>Exercise 1</h1>
+    <p>This exercise concerns reflections in an ellipse when the initial ray passes through one of the two foci. The ray
+        is repeatedly reflected back and forth through alternate foci and approaches the major axis. In the graphic
+        below, the ray always begins at the left focus. The eccentricity of the ellipse, the initial heading of the ray,
+        and the number of reflections are all adjustable. The initial ray before reflection is shown in red; the
+        reflected rays are shown in blue.</p>
+    <div>
+        <table>
+            <tr>
+                <td><label for="eccentricity_ex1_input">Eccentricity</label></td>
+                <td><input id="eccentricity_ex1_input" type="range" name="eccentricity" min="0" max="0.99" step="0.01">
+                </td>
+                <td id="eccentricity_ex1_value"></td>
+            </tr>
+            <tr>
+                <td><label for="initial_angle_ex1_input">Initial angle (deg)</label></td>
+                <td><input id="initial_angle_ex1_input" type="range" name="initial angle" min="0" max="355" step="1"
+                        value="90"></td>
+                <td id="initial_angle_ex1_value"></td>
+            </tr>
+            <tr>
+                <td><label for="number_of_reflections_ex1_input">Number of reflections</label></td>
+                <td><input id="number_of_reflections_ex1_input" type="range" name="number of reflections" min="1"
+                        max="100" step="1" value="1"></td>
+                <td id="number_of_reflections_ex1_value"></td>
+            </tr>
+        </table>
+    </div>
+    <canvas id="ex1" width="500" height="500">Exercise 1 Graphic</canvas>
+    <h1>Exercise 2</h1>
+    <p>This exercise concerns reflections in an ellipse when the initial ray does not pass exactly through one of the
+        two foci. If the ray passes between the two foci, all reflections do the same, and are all tangent to a confocal
+        hyperbola. If the ray does not pass between the two foci, all reflections do the same, and are all tangent to a
+        confocal ellipse. This is illustrated in the graphic below. The eccentricity of the ellipse, the initial point
+        and heading of the ray, and the number of reflections are all adjustable. The initial ray before reflection is
+        shown in red; the reflected rays are shown in blue.</p>
+    <div>
+        <table>
+            <tr>
+                <td><label for="eccentricity_ex2_input">Eccentricity</label></td>
+                <td><input id="eccentricity_ex2_input" type="range" name="eccentricity" min="0" max="0.99" step="0.01">
+                </td>
+                <td id="eccentricity_ex2_value"></td>
+            </tr>
+            <tr>
+                <td><label for="initial_point_angle_ex2_input">Initial point angle (deg)</label></td>
+                <td><input id="initial_point_angle_ex2_input" type="range" name="initial point angle" min="0" max="355"
+                        step="1" value="0"></td>
+                <td id="initial_point_angle_ex2_value"></td>
+            </tr>
+            <tr>
+                <td><label for="initial_angle_ex2_input">Initial angle (deg)</label></td>
+                <td><input id="initial_angle_ex2_input" type="range" name="initial angle" min="0" max="355" step="1"
+                        value="120"></td>
+                <td id="initial_angle_ex2_value"></td>
+            </tr>
+            <tr>
+                <td><label for="number_of_reflections_ex2_input">Number of reflections</label></td>
+                <td><input id="number_of_reflections_ex2_input" type="range" name="number of reflections" min="1"
+                        max="100" step="1" value="50"></td>
+                <td id="number_of_reflections_ex2_value"></td>
+            </tr>
+        </table>
+    </div>
+    <canvas id="ex2" width="500" height="500">Exercise 2 Graphic</canvas>
+    <script>
+        function renderEx1() {
+            const eccentricity_input = document.getElementById("eccentricity_ex1_input");
+            const initial_angle_input = document.getElementById("initial_angle_ex1_input");
+            const number_of_reflections_input = document.getElementById("number_of_reflections_ex1_input");
+
+            e = parseFloat(eccentricity_input.value);
+            theta0_deg = parseFloat(initial_angle_input.value);
+            n = parseInt(number_of_reflections_input.value);
+
+            document.getElementById("eccentricity_ex1_value").innerHTML = e;
+            document.getElementById("initial_angle_ex1_value").innerHTML = theta0_deg;
+            document.getElementById("number_of_reflections_ex1_value").innerHTML = n;
+
+            const canvas = document.getElementById("ex1");
+            const context = canvas.getContext("2d");
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            context.clearRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const a = 0.8 * cx;
+            const b = a * Math.sqrt(1 - e * e);
+
+            const ellipsePath = new Path2D();
+            ellipsePath.ellipse(cx, cy, a, b, 0, 0, 2 * Math.PI);
+            context.lineWidth = 2;
+            context.strokeStyle = "black";
+            context.stroke(ellipsePath);
+
+            const leftFocusPath = new Path2D();
+            leftFocusPath.arc(cx - a * e, cy, 2, 0, 2 * Math.PI);
+            context.fill(leftFocusPath);
+
+            const rightFocusPath = new Path2D();
+            rightFocusPath.arc(cx + a * e, cy, 2, 0, 2 * Math.PI);
+            context.fill(rightFocusPath);
+
+            let px = -a * e;
+            let py = 0;
+            let theta = theta0_deg * (Math.PI / 180);
+            let vx = Math.cos(theta);
+            let vy = Math.sin(theta);
+
+            const initialRay = new Path2D();
+            const reflectedRay = new Path2D();
+            initialRay.moveTo(cx + px, cy - py);
+            for (i = 0; i < n + 1; ++i) {
+                const aa = (vx / a) * (vx / a) + (vy / b) * (vy / b);
+                const bb = 2 * ((px / a) * (vx / a) + (py / b) * (vy / b));
+                const cc = (px / a) * (px / a) + (py / b) * (py / b) - 1;
+                const t = (-bb + Math.sqrt(bb * bb - 4 * aa * cc)) / (2 * aa);
+                px = px + vx * t;
+                py = py + vy * t;
+                const sign = -(2 * (i % 2) - 1);
+                vx = sign * a * e - px;
+                vy = -py;
+                const tmp = Math.sqrt(vx * vx + vy * vy);
+                vx = vx / tmp;
+                vy = vy / tmp;
+                if (i == 0) {
+                    initialRay.lineTo(cx + px, cy - py);
+                    reflectedRay.moveTo(cx + px, cy - py);
+                } else {
+                    reflectedRay.lineTo(cx + px, cy - py);
+                }
+            }
+            context.lineWidth = 1;
+            context.strokeStyle = "red";
+            context.stroke(initialRay);
+            context.strokeStyle = "blue";
+            context.stroke(reflectedRay);
+        }
+
+        function renderEx2() {
+            const eccentricity_input = document.getElementById("eccentricity_ex2_input");
+            const initial_point_angle = document.getElementById("initial_point_angle_ex2_input");
+            const initial_angle_input = document.getElementById("initial_angle_ex2_input");
+            const number_of_reflections_input = document.getElementById("number_of_reflections_ex2_input");
+
+            e = parseFloat(eccentricity_input.value);
+            alpha_deg = parseFloat(initial_point_angle.value);
+            theta0_deg = parseFloat(initial_angle_input.value);
+            n = parseInt(number_of_reflections_input.value);
+
+            document.getElementById("eccentricity_ex2_value").innerHTML = e;
+            document.getElementById("initial_point_angle_ex2_value").innerHTML = alpha_deg;
+            document.getElementById("initial_angle_ex2_value").innerHTML = theta0_deg;
+            document.getElementById("number_of_reflections_ex2_value").innerHTML = n;
+
+            const canvas = document.getElementById("ex2");
+            const context = canvas.getContext("2d");
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            context.clearRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const a = 0.8 * cx;
+            const b = a * Math.sqrt(1 - e * e);
+
+            const ellipsePath = new Path2D();
+            ellipsePath.ellipse(cx, cy, a, b, 0, 0, 2 * Math.PI);
+            context.lineWidth = 2;
+            context.strokeStyle = "black";
+            context.stroke(ellipsePath);
+
+            const leftFocusPath = new Path2D();
+            leftFocusPath.arc(cx - a * e, cy, 2, 0, 2 * Math.PI);
+            context.fillStyle = "black";
+            context.fill(leftFocusPath);
+
+            const rightFocusPath = new Path2D();
+            rightFocusPath.arc(cx + a * e, cy, 2, 0, 2 * Math.PI);
+            context.fillStyle = "black";
+            context.fill(rightFocusPath);
+
+            const alpha = alpha_deg * (Math.PI / 180);
+            let px = a * Math.cos(alpha);
+            let py = b * Math.sin(alpha);
+            let theta = theta0_deg * (Math.PI / 180);
+            let vx = Math.cos(theta);
+            let vy = Math.sin(theta);
+
+            const initialPointPath = new Path2D();
+            initialPointPath.arc(cx + px, cy - py, 4, 0, 2 * Math.PI);
+            context.fillStyle = "red";
+            context.fill(initialPointPath);
+
+            const initialRay = new Path2D();
+            const reflectedRay = new Path2D();
+            initialRay.moveTo(cx + px, cy - py);
+            for (i = 0; i < n + 1; ++i) {
+                const aa = (vx / a) * (vx / a) + (vy / b) * (vy / b);
+                const bb = 2 * ((px / a) * (vx / a) + (py / b) * (vy / b));
+                const cc = (px / a) * (px / a) + (py / b) * (py / b) - 1;
+                const t = (-bb + Math.sqrt(bb * bb - 4 * aa * cc)) / (2 * aa);
+                if (t <= 1e-10) {
+                    if (i == 0) {
+                        px = px + vx * a;
+                        py = py + vy * a;
+                        initialRay.lineTo(cx + px, cy - py);
+                        context.lineWidth = 1;
+                        context.strokeStyle = "red";
+                        context.stroke(initialRay);
+                    }
+                    return;
+                }
+                px = px + vx * t;
+                py = py + vy * t;
+                let nx = px / (a * a);
+                let ny = py / (b * b);
+                let tmp = Math.sqrt(nx * nx + ny * ny);
+                nx = nx / tmp;
+                ny = ny / tmp;
+                tmp = vx * nx + vy * ny;
+                vx = vx - 2 * tmp * nx;
+                vy = vy - 2 * tmp * ny;
+                if (i == 0) {
+                    initialRay.lineTo(cx + px, cy - py);
+                    reflectedRay.moveTo(cx + px, cy - py);
+                } else {
+                    reflectedRay.lineTo(cx + px, cy - py);
+                }
+            }
+            context.lineWidth = 1;
+            context.strokeStyle = "red";
+            context.stroke(initialRay);
+            context.strokeStyle = "blue";
+            context.stroke(reflectedRay);
+        }
+
+        document.getElementById("eccentricity_ex1_input").addEventListener("input", renderEx1);
+        document.getElementById("initial_angle_ex1_input").addEventListener("input", renderEx1);
+        document.getElementById("number_of_reflections_ex1_input").addEventListener("input", renderEx1);
+
+        document.getElementById("eccentricity_ex2_input").addEventListener("input", renderEx2);
+        document.getElementById("initial_point_angle_ex2_input").addEventListener("input", renderEx2);
+        document.getElementById("initial_angle_ex2_input").addEventListener("input", renderEx2);
+        document.getElementById("number_of_reflections_ex2_input").addEventListener("input", renderEx2);
+    </script>
+</body>
+
+</html>
